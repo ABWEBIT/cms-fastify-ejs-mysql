@@ -12,10 +12,16 @@ https://ejs.co/
 Система хранения баз данных  
 https://www.mysql.com/  
 
-# Доп. информация, пакеты, плагины
+Плагин Fastify, который загружает все плагины, найденные в каталоге, и автоматически настраивает маршруты в соответствии со структурой папок  
 https://www.npmjs.com/package/@fastify/autoload  
+
+Плагин для максимально быстрой обработки статических файлов  
 https://www.npmjs.com/package/@fastify/static  
+
+Плагин для рендеринга шаблонов с поддержкой разных движков  
 https://www.npmjs.com/package/@fastify/view  
+
+Плагин для работы с mysql сервером  
 https://www.npmjs.com/package/mysql2  
 
 ## Версии
