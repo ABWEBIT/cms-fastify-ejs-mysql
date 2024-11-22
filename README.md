@@ -1,1 +1,4 @@
-# cms-fastify-ejs-mysql
+# Технологии
+
+Серверный пакет  
+https://fastify.dev/
