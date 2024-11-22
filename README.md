@@ -12,6 +12,8 @@ https://ejs.co/
 Система хранения баз данных  
 https://www.mysql.com/  
 
+## Плагины, пакеты
+
 Автоматическая загрука всех плагинов из каталога и автонастройка маршрутов  
 https://www.npmjs.com/package/@fastify/autoload  
 
