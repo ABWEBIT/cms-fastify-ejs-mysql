@@ -20,7 +20,7 @@ https://www.npmjs.com/package/@fastify/autoload
 Обработка статических файлов  
 https://www.npmjs.com/package/@fastify/static  
 
-Рендеринга шаблонов с поддержкой разных движков  
+Рендеринг шаблонов (поддержка разных движков)  
 https://www.npmjs.com/package/@fastify/view  
 
 Работа с mysql сервером  
