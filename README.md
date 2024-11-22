@@ -36,3 +36,6 @@ autoload - 6.0.2
 static - 8.0.2  
 view - 10.0.1  
 
+###Архитектура
+Model View Controller
+
