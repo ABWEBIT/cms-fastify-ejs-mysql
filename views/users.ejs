@@ -1,0 +1,236 @@
+<%# ---------- main ---------- %>
+<main>
+
+  <div class="static">
+    <div class="title"><%= title %></div>
+  </div>
+
+  <div class="dynamic">
+
+    <div class="tableHelper tableManagement">
+      <div>
+        <button- class="create" _href="/admin/users/user-new" _text="Создать" _prefix="svgPlus"></button->
+        <button- class="delete" onclick="tableDeleteItems(this)" _prefix="svgTrash"></button->
+      </div>
+      <div>
+        <select onchange="rowsNumber(this)" name="rowsNumber">
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="25">50</option>
+        </select>
+        <input-
+        class="w100pc"
+        _type="text"
+        _placeholder="Поиск по имени"
+        _prefix="svgSearch"></input->
+      </div>
+    </div>
+
+    <%# ---------- table ---------- %>
+    <table data-controller="users">
+      <thead>
+        <tr>
+          <td class="manage w40px">
+            <input class="checkboxParent" type="checkbox">
+          </td>
+          <td>Имя пользователя</td>
+          <td>Электронная почта</td>
+          <td>Роль</td>
+          <td class="manage w50px"></td>
+        </tr>
+      </thead>
+      <tbody>
+      <% usersData.forEach(user => { %>
+        <tr data-id="<%= user.userId %>">
+          <td class="manage w40px"><% if(user.userId !== 1){ %>
+            <input class="checkboxChild" type="checkbox" value="<%= user.userId %>"><% }; %>
+          </td>
+          <td><%= user.userUsername %></td>
+          <td><%= user.userEmail %></td>
+          <td><%= user.userRole %></td>
+          <td class="manage w50px">
+            <button- class="edit" _href="/admin/users/user-edit/<%= user.userId %>" _prefix="svgPencil"></button->
+          </td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+
+    <%- include('./modules/table-pagination.ejs') %>
+
+  </div>
+
+</main>
+
+<script>
+rowsNumber = async (e) => {
+  console.log(e.value);
+};
+
+
+//--------------------
+checkboxFunc = () => {
+  let checkboxItem = document.querySelectorAll('[type="checkbox"]');
+  let checkboxParent = document.querySelector('.checkboxParent');
+  let checkboxChild = document.querySelectorAll('.checkboxChild');
+  
+  if(checkboxItem.length === 0) return;
+
+  checkboxItem.forEach(item =>{
+    item.addEventListener('click',() => {
+      if(item.classList.contains('checkboxParent')) parent()
+      else if(item.classList.contains('checkboxChild'))
+        checkboxParent.checked = (status() === true) ? false : true;
+    });
+  });
+
+  function status(){
+    return Array.from(checkboxChild).some(child => !child.checked);
+  };
+
+  function parent(){
+    if(status() === true) checkboxChild.forEach(child => child.checked = true)
+    else checkboxChild.forEach(child => child.checked = false);
+  };
+
+};
+checkboxFunc();
+
+//--------------------
+tableDeleteItems = async (button) => {
+  button.classList.add('disabled');
+  let checkboxChild = document.querySelectorAll('.checkboxChild');
+  let itemsChecked = Array.from(checkboxChild).filter(item => item.checked).map(item => item.value);
+
+  if(itemsChecked.length === 0) return;
+
+  try{
+    const response = await fetch('/admin/users',{
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json;charset=utf-8'},
+      body: JSON.stringify({itemsId: itemsChecked})
+    });
+    const data = await response.json();
+
+    document.querySelector('.checkboxParent').checked = false;
+    itemsChecked.forEach(id => document.querySelector(`[data-id="${id}"]`).remove());
+
+    let table = document.querySelector('[data-controller="users"]');
+    let tableData = '';
+
+    if((data.usersData).length > 0){
+      (data.usersData).forEach(user => {
+
+        tableData += `
+        <tr data-id="${user.userId}">
+          <td class="manage w40px">
+            ${user.userId > 1 ? `<input class="checkboxChild" type="checkbox" value="${user.userId}">` : ''}
+          </td>
+          <td>${user.userUsername}</td>
+          <td>${user.userEmail}</td>
+          <td>${user.userRole}</td>
+          <td class="manage w50px">
+            <button- class="edit" _href="/admin/users/user-edit/${user.userId}" _prefix="svgPencil"></button->
+          </td>
+        </tr>`;
+      });
+
+      table.querySelector('tbody').innerHTML = tableData;
+    }
+    checkboxFunc();
+    document.querySelector('table-pagination[data-controller="users"]').update();
+
+
+  }
+  catch(error){
+    throw new Error(error.message)
+  }
+
+};
+
+
+
+//--------------------
+/*
+const search = document.querySelector('input[name="search"]');
+if(search) search.addEventListener('keyup',() => usersSearchFunc());
+
+
+usersSearchFunc = async () => {
+  let searchValue = document.querySelector('input[name="search"]').value;
+
+  if(searchValue.length >= 0){
+    const response = await fetch('/admin/users',{
+      method: 'POST',
+      headers: {'Content-Type': 'application/json;charset=utf-8'},
+      body: JSON.stringify({
+        searchQuery: searchValue
+      })
+    })
+    .then(response => {return response.json()})
+    .then(data =>{
+
+    let table = document.querySelector('[data-controller="users"]');
+    let tableBody = table.querySelector('tbody');
+    let tableData = '';
+
+    if((data.usersData).length > 0){
+      (data.usersData).forEach(user => {
+
+          tableData += `
+          <tr data-id="${user.userId}">
+            <td class="manage w40px">
+              ${user.userId > 1 ? `<input class="checkboxChild" type="checkbox" value="${user.userId}">` : ''}
+            </td>
+            <td>${user.userUsername}</td>
+            <td>${user.userEmail}</td>
+            <td>${user.userRole}</td>
+            <td class="manage w50px">
+              <button- class="edit" _href="/admin/users/user-edit/${user.userId}" _prefix="svgPencil"></button->
+            </td>
+          </tr>`;
+
+        });
+        tableBody.innerHTML = tableData;
+        checkboxFunc();
+      }
+      else tableContent.innerHTML = '<div class="tableMessage">Ничего не найдено</div>';
+
+    })
+    .catch(error => {
+      throw new Error(error);
+    });
+
+
+  };
+
+};
+
+
+
+
+
+
+
+
+
+
+
+async function pageNumberGet(){
+  const input = document.querySelector('.pageNumber');
+  if(input) return input.value ? input.value : null
+  else return false;
+}
+
+async function pageNumberSet(){
+  const input = document.querySelector('.pageNumber');
+  if(input) input.value ? input.value : 1;
+}
+
+async function pageNumberPut(number){
+  const input = document.querySelector('.pageNumber');
+  if(input) {input.value = number; return true}
+  else return false;
+}
+*/
+</script>

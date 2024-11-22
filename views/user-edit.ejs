@@ -1,0 +1,85 @@
+<%# ---------- main ---------- %>
+<main>
+
+  <div class="static">
+    <div class="title"><%= title %></div>
+  </div>
+
+  <div class="dynamic">
+
+    <div class="userProfile">
+      <div class="formField">
+        <div class="formText">Имя пользователя</div>
+        <div class="formData">
+          <input type="text" name="userUsername" value="<%= userUsername %>">
+        </div>
+      </div>
+      <div class="formField">
+        <div class="formText">Э-почта</div>
+        <div class="formData">
+          <input type="text" name="userEmail" value="<%= userEmail %>">
+        </div>
+      </div>
+      <div class="formField">
+        <div class="formText">Пароль</div>
+        <div class="formData">
+          <input type="text" name="userPassword">
+        </div>
+      </div>
+      <div class="formField">
+        <div class="formText">Роль</div>
+        <div class="formData">
+          <input type="text" name="userRole" value="<%= userRole %>">
+        </div>
+      </div>
+      <div class="formField">
+        <div class="formText">Дата создания</div>
+        <div class="formData"><%= userCreated %></div>
+      </div>
+    </div>
+
+    <div class="helper">
+      <div>
+        <button- data-action="save" _text="Сохранить"></button->
+      </div>
+    </div>
+
+    <div class="message"></div>
+
+  </div>
+
+</main>
+<script>
+const save = document.querySelector('button-[data-action="save"]');
+if(save) save.addEventListener('click',() => saveFunc());
+
+async function saveFunc(){
+  const userId = '<%= userId %>';
+  const userUsername = document.querySelector('input[name="userUsername"]').value;
+  const userEmail = document.querySelector('input[name="userEmail"]').value;
+  const userPassword = document.querySelector('input[name="userPassword"]').value;
+  const userRole = document.querySelector('input[name="userRole"]').value;
+
+  try{
+    const response = await fetch(`/admin/users/user-edit/${userId}`,{
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json;charset=utf-8'},
+      body: JSON.stringify({
+        userId: userId,
+        userUsername: userUsername,
+        userEmail: userEmail,
+        userPassword: userPassword,
+        userRole: userRole
+      })
+    });
+    if(response.ok){
+      const data = await response.json();
+      document.querySelector('.message').innerText = 'Данные обновлены';
+    };
+  }
+  catch(error){
+    throw new Error(error);
+  };
+
+};
+</script>

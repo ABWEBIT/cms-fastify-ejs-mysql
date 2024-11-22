@@ -1,0 +1,95 @@
+<%# ---------- table pagination ---------- %>
+<script>
+class TablePagination extends HTMLElement{
+  constructor(){
+    super();
+    this.rendered = false;
+    this.entriesTotal = 0;
+    this.pagesTotal = 1;
+    this.pagesCurrent = 1;
+    this.controller = '';
+  };
+
+  get entriesTotalNumber(){return this.entriesTotal;};
+  get pagesTotalNumber(){return this.pagesTotal;};
+  get pagesCurrentNumber(){return this.pagesCurrent;};
+
+  setNumber(property,value){
+    value = Number.parseInt(value);
+    if(value > -1 && value !== this[property] && !isNaN(value)) {
+      this[property] = value;
+      this.rendered ? this[`${property}Update`]() : this.render();
+    }
+  };
+
+  set entriesTotalNumber(value){this.setNumber('entriesTotal',value);};
+  set pagesTotalNumber(value){this.setNumber('pagesTotal',value);};
+  set pagesCurrentNumber(value){this.setNumber('pagesCurrent',value);};
+
+  connectedCallback(){
+    this.controller = this.dataset.controller;
+    this.update();
+  };
+
+  async update(){
+    try{
+      const response = await fetch(`/admin/${this.controller}/data`,{
+        method: 'POST',
+        headers: {'Content-Type': 'application/json;charset=utf-8'},
+        body: JSON.stringify({dataType: 'paginationData'})
+      });
+      const data = await response.json();
+      this.entriesTotalNumber = data.entriesTotal;
+      this.pagesTotalNumber = data.pagesTotal;
+      this.pagesCurrentNumber = data.pagesCurrent;
+    }
+    catch(error){
+      throw new Error(error.message);
+    }
+  };
+
+  render(){
+    this.innerHTML = `
+      <div class="pagesNavigation">
+        <button- class="default w30px h30px" _prefix="svgArrowLeft"></button->
+        <button- class="default w30px h30px" _suffix="svgArrowRight"></button->
+      </div>
+      <div class="pagesTotal">
+        <input- class="w60px h30px" _type="number" _placeholder="${this.pagesTotal}"></input->
+        <span>из <data>${this.pagesTotal}</data></span>
+      </div>
+      <div class="entriesTotal h30px">
+        <span>Всего <data>${this.entriesTotal}</data></span>
+      </div>`;
+    this.rendered = true;
+  };
+
+  entriesTotalUpdate(){
+    this.querySelector('.entriesTotal > span > data').innerText = this.entriesTotal;
+  };
+
+  pagesTotalUpdate(){
+    this.querySelector('.pagesTotal > span > data').innerText = this.pagesTotal;
+  };
+
+  pagesCurrentUpdate(){
+    this.querySelector('.pagesTotal > input- input').setAttribute('placeholder',this.pagesCurrent);
+  };
+
+};
+customElements.define('table-pagination',TablePagination);
+
+// create pagination
+createTablePaginations = () =>{
+  let tables = document.querySelectorAll('table');
+  if(tables.length > 0){
+    tables.forEach(table => {
+      let controller = table.dataset.controller;
+      let tablePagination = document.createElement('table-pagination');
+      tablePagination.dataset.controller = controller;
+      table.insertAdjacentElement("afterend",tablePagination);
+    });
+  };
+};
+createTablePaginations();
+</script>

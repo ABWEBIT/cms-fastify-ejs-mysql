@@ -1,0 +1,79 @@
+<%# ---------- main ---------- %>
+<main>
+
+  <div class="static">
+    <div class="title"><%= title %></div>
+  </div>
+
+  <div class="dynamic">
+
+    <div class="userProfile">
+      <div class="formField">
+        <div class="formText">Имя пользователя</div>
+        <div class="formData">
+          <input type="text" name="userUsername">
+        </div>
+      </div>
+      <div class="formField">
+        <div class="formText">Э-почта</div>
+        <div class="formData">
+          <input type="text" name="userEmail">
+        </div>
+      </div>
+      <div class="formField">
+        <div class="formText">Пароль</div>
+        <div class="formData">
+          <input type="text" name="userPassword" value="password">
+        </div>
+      </div>
+      <div class="formField">
+        <div class="formText">Роль</div>
+        <div class="formData">
+          <input type="text" name="userRole" value="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="helper">
+      <div>
+        <button- data-action="save" _text="Сохранить"></button->
+      </div>
+    </div>
+
+    <div class="message"></div>
+
+  </div>
+
+</main>
+<script>
+const save = document.querySelector('button-[data-action="save"]');
+if(save) save.addEventListener('click',() => saveFunc());
+
+async function saveFunc(){
+  let userUsername = document.querySelector("input[name='userUsername']");
+  let userEmail = document.querySelector("input[name='userEmail']");
+  let userPassword = document.querySelector("input[name='userPassword']");
+  let userRole = document.querySelector("input[name='userRole']");
+  try{
+    let response = await fetch('/admin/users/user-new',{
+      method: 'POST',
+      headers: {'Content-Type': 'application/json;charset=utf-8'},
+      body: JSON.stringify({
+        userUsername: userUsername.value,
+        userEmail: userEmail.value,
+        userPassword: userPassword.value,
+        userRole: userRole.value
+      }),
+    });
+    if(response.ok){
+      userUsername.value = '';
+      userEmail.value = '';
+      document.querySelector('.message').innerText = 'Пользователь создан';
+    };
+  }
+  catch(error){
+    throw new Error(error);
+  };
+
+};
+</script>
