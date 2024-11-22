@@ -19,9 +19,12 @@ https://www.npmjs.com/package/@fastify/view
 https://www.npmjs.com/package/mysql2  
 
 ## Версии
-@fastify/autoload@6.0.2  
-@fastify/static@8.0.2  
-@fastify/view@10.0.1  
-ejs@3.1.10  
-fastify@5.1.0  
-mysql2@3.11.4  
+node - 20.18.0
+fastify - 5.1.0  
+ejs - 3.1.10  
+mysql server - 8.0.39
+mysql2 - 3.11.4  
+autoload - 6.0.2  
+static - 8.0.2  
+view - 10.0.1  
+
