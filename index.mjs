@@ -4,15 +4,21 @@ import fastifyStatic from '@fastify/static'
 import fastifyAutoLoad from '@fastify/autoload'
 import ejs from 'ejs'
 import path from 'node:path'
+import fs from 'node:fs'
 import {fileURLToPath} from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const appPort = 3000
 const appHost = '127.0.0.1'
+const appPort = 443
 
 const app = fastifyFramework({
+  http2: true,
+  https:{
+    key: fs.readFileSync(path.join(__dirname,'private/certs/key.pem')),
+    cert: fs.readFileSync(path.join(__dirname,'private/certs/crt.pem'))
+  },
   logger: false,
   ignoreTrailingSlash: true,
   caseSensitive: false
@@ -38,7 +44,7 @@ await app.register(fastifyAutoLoad,{
 
 try{
   await app.listen({port: appPort, host: appHost})
-  console.log(`http://${appHost}:${appPort}/`)
+  console.log(`https://${appHost}:${appPort}/`)
 }
 catch(error){
   console.error(error)
